@@ -5,11 +5,9 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-
 #define PAGELEN 24 /* macro definition, allow constant values to be \
  declared for use throughout your code */
 #define LINELEN 512
-
 void do_more(FILE *); /* Forward declaration for a function. It tells
  the compiler you're going to define the function
  later. The function could be in a different file.
@@ -21,13 +19,8 @@ int main(int ac, char *av[])
 {
   FILE *fp; /* A file pointer with variable name of fp */
   if (ac == 1)
-  {
-    /* No file provided... */
-    printf("No file name provided.\n");
-    return 1;
-  }
+    do_more(stdin);
   else
-    /* Browse through provided files*/
     while (--ac)
     {
       if ((fp = fopen(*++av, "r")) != NULL)
@@ -36,17 +29,7 @@ int main(int ac, char *av[])
         fclose(fp);
       }
       else
-      {
-        if (ac > 1)
-        {
-          printf("\nFile %s could not be found. Continuing...\n", *av);
-        }
-        else
-        {
-          printf("\nFile %s could not be found.\n", *av);
-          exit(1); // exit, 1 means something wrong
-        }
-      }
+        exit(1); // exit, 1 means something wrong
     }
   return 0; // 0 means every OK
 }
@@ -65,10 +48,8 @@ void do_more(FILE *fp)
       {
         break;
       }
-
       num_of_lines -= reply;
     }
-
     if (fputs(line, stdout) == EOF) // EOF: End of File
     {
       exit(1);
@@ -81,20 +62,15 @@ void do_more(FILE *fp)
 int see_more()
 {
   int c;
-  char line[LINELEN];
-
-  printf("\033[7m more? \033[m");                  // reverse the monitor
-  while (fgets(line, sizeof(line), stdin) != NULL) // get response
+  printf("\033[7m more? \033[m"); // reverse the monitor
+  while ((c = getchar()) != EOF)  // get response
   {
-    c = line[0];
     if (c == 'q')
       return 0;
     if (c == ' ')
       return PAGELEN;
     if (c == '\n')
       return 1;
-    if (c == 'h')
-      return PAGELEN / 2;
   }
   return 0;
 }
